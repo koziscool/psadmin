@@ -1,6 +1,29 @@
 
 $ = jQuery = require('jquery');
-var App = console.log('hello world form Browserify');
+var React = require('react');
+var Home = require('./components/homePage');
+var About = require('./components/about/aboutPage');
 
-module.exports = App;
+var App = React.createClass({
+    render: function() {
+        var Child;
+        switch(this.props.route){
+            case 'about': Child = About; break;
+            default: Child = Home;
+        }
 
+        return (
+            <div>
+                <Child/>
+            </div>
+        );
+    }
+});
+
+var render = function() {
+    var route = window.location.hash.substr(1);
+    React.render( <App route={route}/>, document.getElementById('app'));
+};
+
+window.addEventListener('hashchange', render);
+render();
