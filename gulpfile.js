@@ -4,13 +4,18 @@
 var gulp = require('gulp');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
+var browserify = require('browserify');
+var reactify = require( 'reactify');
+var source = require('vinyl-source-stream');
 
 var config = {
     port: 9005,
     devBaseUrl: 'http://localhost',
     paths: {
         html: './src/*.html',
-        dist: './dist'
+        js: '.src/**/*.js',
+        dist: './dist',
+        mainJs: './src/main.js'
     },
 }
 
@@ -21,7 +26,6 @@ gulp.task( 'connect', function() {
         base: config.devBaseUrl,
         livereload: true,
     });
-
 });
 
 gulp.task('open', ['connect'], function(){
@@ -35,11 +39,24 @@ gulp.task('html', function(){
         .pipe( connect.reload() );
 });
 
+gulp.task( 'js', function function_name() {
+    browserify( config.paths.mainJs)
+        .transform(reactify)
+        .bundle()
+        .on( 'error', console.error.bind(console))
+        .pipe( source('bundle.js'))
+        .pipe(gulp.dest(config.paths.dist + '/scripts'))
+        .pipe(connect.reload());
+});
+
 gulp.task( 'watch', function(){
     gulp.watch( config.paths.html, ['html'] );
-})
+    gulp.watch( config.paths.js, ['js'] );
+});
 
-gulp.task('default', ['html' ,'open', 'watch' ] );
+gulp.task('default', ['html' ,'js', 'open', 'watch' ] );
+
+
 
 
 
